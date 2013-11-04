@@ -1,0 +1,59 @@
+{
+  "provisioners": [
+    {
+      "type": "shell",
+      "scripts": [
+        "scripts/base.sh",
+        "scripts/rvm.sh",
+        "scripts/vagrant.sh",
+        "scripts/update.sh",
+        "scripts/devtools.sh",
+        "scripts/vmtools.sh",
+        "scripts/superclean.sh",
+        "scripts/zerodisk.sh"
+      ],
+      "override": {
+        "vmware": {
+          "execute_command": "echo 'vagrant'|{{.Vars}} sudo -E -S bash '{{.Path}}'"
+        }
+      }
+    }
+  ],
+  "builders": [
+    {
+      "vm_name": "data-workbench",
+      "type": "vmware",
+      "boot_command": [
+        "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks.cfg<enter><wait>"
+      ],
+      "boot_wait": "15s",
+      "disk_size": 20280,
+      "guest_os_type": "centos-64",
+      "http_directory": "http",
+      "iso_checksum": "0128cfc7c86072b13ee80dd013e0e5d7",
+      "iso_checksum_type": "md5",
+      "iso_urls": [
+          "../iso/CentOS-6.4-x86_64-bin-DVD1.iso",
+          "http://mirrors.kernel.org/centos/6.4/isos/x86_64/CentOS-6.4-x86_64-bin-DVD1.iso"
+      ],
+      "ssh_username": "vagrant",
+      "ssh_password": "vagrant",
+      "ssh_port": 22,
+      "ssh_wait_timeout": "10000s",
+      "tools_upload_flavor": "linux",
+      "shutdown_command": "echo 'vagrant'|sudo -S shutdown -P now",
+      "vmx_data": {
+        "memsize": "480",
+        "numvcpus": "1",
+        "cpuid.coresPerSocket": "1"
+      }
+    }
+  ],
+  "post-processors": [
+    {
+      "type": "vagrant",
+      "keep_input_artifact": false,
+      "output": "../box/workbench-centos64-x64-{{.Provider}}.box"
+    }
+  ]
+}
